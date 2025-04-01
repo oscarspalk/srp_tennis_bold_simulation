@@ -58,8 +58,8 @@ def pressure_poisson_periodic(p, dx, dy):
     return p
 
 ##variable declarations
-nx = 301
-ny = 301
+nx = 1001
+ny = 1001
 nt = 10
 nit = 50 
 c = 1
@@ -185,9 +185,9 @@ while udiff > .001:
     udiff = (numpy.sum(u) - numpy.sum(un)) / numpy.sum(u)
     stepcount += 1
 
-scaling = 16
-
+scaling = 30
 fig = pyplot.figure(figsize = (11,7), dpi=100)
+
 pyplot.quiver(X[::scaling, ::scaling], Y[::scaling, ::scaling], u[::scaling, ::scaling], v[::scaling, ::scaling])
 
 pyplot.show()
