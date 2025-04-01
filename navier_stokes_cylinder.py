@@ -2,6 +2,16 @@ import numpy
 from matplotlib import pyplot, cm
 from mpl_toolkits.mplot3d import Axes3D
 
+## Creates a circle at a given point in a 2D array
+def circle(x, y, r, arr, val):
+    radiusSquared = r**2
+    for i in range(x-r, x+r):
+        for j in range(y-r, y+r):
+            distanceToCenter = (i-x)**2+(j-y)**2
+            if radiusSquared > distanceToCenter:
+                # we are inside the circle
+                arr[i,j] = val
+
 def build_up_b(rho, dt, dx, dy, u, v):
     b = numpy.zeros_like(u)
     b[1:-1, 1:-1] = (rho * (1 / dt * ((u[1:-1, 2:] - u[1:-1, 0:-2]) / (2 * dx) +
@@ -27,6 +37,8 @@ def build_up_b(rho, dt, dx, dy, u, v):
                               (v[1:-1, 1] - v[1:-1, -1]) / (2 * dx))-
                          ((v[2:, 0] - v[0:-2, 0]) / (2 * dy))**2))
     
+    # Static BC Pressure @ cylinder, p = 0
+
     return b
 
 def pressure_poisson_periodic(p, dx, dy):
@@ -55,6 +67,9 @@ def pressure_poisson_periodic(p, dx, dy):
         p[-1, :] =p[-2, :]  # dp/dy = 0 at y = 2
         p[0, :] = p[1, :]  # dp/dy = 0 at y = 0
     
+        # Static BC Pressure @ cylinder, p = 0
+        #circle(500, 500, 150, p, 0)
+
     return p
 
 ##variable declarations
@@ -64,7 +79,7 @@ nt = 10
 nit = 50 
 c = 1
 
-length_y = 10
+length_y = 50
 length_x = 50
 
 dx = length_x / (nx - 1)
@@ -77,25 +92,25 @@ X, Y = numpy.meshgrid(x, y)
 ##physical variables
 rho = 1
 nu = .1
-F = 1
+F = 0
 dt = .01
 
 #initial conditions
-u = numpy.zeros((ny, nx), )
-un = numpy.zeros((ny, nx))
+u = numpy.full((ny, nx), 5., dtype=numpy.float64)
+un = numpy.zeros((ny, nx),dtype=numpy.float64)
 
-v = numpy.zeros((ny, nx))
-vn = numpy.zeros((ny, nx))
+v = numpy.zeros((ny, nx),dtype=numpy.float64)
+vn = numpy.zeros((ny, nx),dtype=numpy.float64)
 
-p = numpy.ones((ny, nx))
-pn = numpy.ones((ny, nx))
+p = numpy.ones((ny, nx),dtype=numpy.float64)
+pn = numpy.ones((ny, nx),dtype=numpy.float64)
 
-b = numpy.zeros((ny, nx))
+b = numpy.zeros((ny, nx),dtype=numpy.float64)
 
 udiff = 1
 stepcount = 0
 
-while udiff > .001:
+while stepcount < 10:
     un = u.copy()
     vn = v.copy()
 
@@ -182,12 +197,18 @@ while udiff > .001:
     v[0, :] = 0
     v[-1, :]=0
     
+    # Static BC Pressure @ cylinder, u,v = 0
+    circle(500, 500, 150, u, 0)
+    circle(500, 500, 150, v, 0)
+
     udiff = (numpy.sum(u) - numpy.sum(un)) / numpy.sum(u)
     stepcount += 1
+    print(f"at step {stepcount}")
 
-scaling = 30
+scaling = 20
 fig = pyplot.figure(figsize = (11,7), dpi=100)
-
-pyplot.quiver(X[::scaling, ::scaling], Y[::scaling, ::scaling], u[::scaling, ::scaling], v[::scaling, ::scaling])
+pyplot.contourf(X, Y, p, alpha=0.5, cmap=cm.viridis)  
+pyplot.colorbar()
+pyplot.streamplot(X,Y,u,v)
 
 pyplot.show()

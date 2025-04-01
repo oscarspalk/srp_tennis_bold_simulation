@@ -48,8 +48,9 @@ def circle(x, y, r, arr, val):
                 # we are inside the circle
                 arr[i,j] = val
          
-            
 circle(500, 500, 150, p, 2)
+
+circle(500, 500, 120, p,1)
 
 surf = ax.plot_surface(xs,ys,ps ,cmap=cm.viridis,
             linewidth=0, antialiased=False)
