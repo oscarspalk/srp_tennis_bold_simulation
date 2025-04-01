@@ -107,13 +107,13 @@ def cavity_flow(nt, u, v, dt, dx, dy, p, rho, nu):
         
     return u, v, p
 
-sigma = .5
+sigma = .15
 dt = sigma * dx
 
 print(f"dx: {dx}")
 print(f"dt: {dt}")
 
-nt = 100
+nt = 500
 u, v, p = cavity_flow(nt, u, v, dt, dx, dy, p, rho, nu)
 
 fig = pyplot.figure(figsize=(11, 7), dpi=100)
