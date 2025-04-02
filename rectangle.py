@@ -6,9 +6,9 @@ from matplotlib.patches import Rectangle
 length_x = 40
 length_y = 40
 
-nx = 41
-ny = 41
-nt = 500
+nx = 101
+ny = 101
+nt = 5000
 nit = 50
 c = 1
 dx = length_x / (nx - 1)
@@ -19,16 +19,18 @@ X, Y = numpy.meshgrid(x, y)
 
 rho = 1
 nu = .1
-dt = .005
+
+sigma = 0.002
+dt = dx*sigma
 
 u = numpy.zeros((ny, nx))
 v = numpy.zeros((ny, nx))
 p = numpy.zeros((ny, nx)) 
 b = numpy.zeros((ny, nx))
 
-square_x = 20
-square_y = 20
-size = 5
+square_x = 50
+square_y = 50
+size = 10
 
 def build_up_b(b, rho, dt, u, v, dx, dy):
     
@@ -128,7 +130,7 @@ ax.add_patch(rectang)
 scaling = 1
 
 # plotting velocity field
-pyplot.streamplot(X[::scaling], Y[::scaling], u[::scaling], v[::scaling], density=3) 
+pyplot.streamplot(X[::scaling], Y[::scaling], u[::scaling], v[::scaling], density=4) 
 pyplot.xlabel('X')
 pyplot.ylabel('Y')
 pyplot.show()
