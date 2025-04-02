@@ -2,13 +2,14 @@ import numpy
 from matplotlib import pyplot, cm
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.patches import Rectangle
+from numba import jit, vectorize, cuda
 
-length_x = 40
-length_y = 40
+length_x = 400
+length_y = 400
 
-nx = 101
-ny = 101
-nt = 5000
+nx = 1001
+ny = 1001
+nt = 50
 nit = 50
 c = 1
 dx = length_x / (nx - 1)
@@ -20,7 +21,7 @@ X, Y = numpy.meshgrid(x, y)
 rho = 1
 nu = .1
 
-sigma = 0.002
+sigma = 0.0005
 dt = dx*sigma
 
 u = numpy.zeros((ny, nx))
@@ -28,12 +29,11 @@ v = numpy.zeros((ny, nx))
 p = numpy.zeros((ny, nx)) 
 b = numpy.zeros((ny, nx))
 
-square_x = 50
-square_y = 50
-size = 10
+square_x = 500
+square_y = 500
+size = 100
 
 def build_up_b(b, rho, dt, u, v, dx, dy):
-    
     b[1:-1, 1:-1] = (rho * (1 / dt * 
                     ((u[1:-1, 2:] - u[1:-1, 0:-2]) / 
                      (2 * dx) + (v[2:, 1:-1] - v[0:-2, 1:-1]) / (2 * dy)) -
@@ -69,6 +69,7 @@ def cavity_flow(nt, u, v, dt, dx, dy, p, rho, nu):
     b = numpy.zeros((ny, nx))
     
     for n in range(nt):
+        print(f"at iteration {n}")
         un = u.copy()
         vn = v.copy()
         
