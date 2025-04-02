@@ -29,6 +29,15 @@ v = zeros((ny, nx))
 p = zeros((ny, nx)) 
 b = zeros((ny, nx))
 
+def circle(x, y, r, arr, val):
+    radiusSquared = r**2
+    for i in range(x-r, x+r):
+        for j in range(y-r, y+r):
+            distanceToCenter = (i-x)**2+(j-y)**2
+            if radiusSquared > distanceToCenter:
+                # we are inside the circle
+                arr[i,j] = val
+
 def build_up_b(b, rho, dt, u, v, dx, dy):
     
     b[1:-1, 1:-1] = (rho * (1 / dt * 
@@ -56,6 +65,7 @@ def pressure_poisson(p, dx, dy, b):
         p[:, -1] = p[:, -2] # dp/dx = 0 at x = 2
         p[0, :] = p[1, :]   # dp/dy = 0 at y = 0
         p[:, 0] = p[:, 1]   # dp/dx = 0 at x = 0
+        p[-1, :] = p[-2, :]
         p[-1, :] = 0        # p = 0 at y = 2
         
     return p
@@ -96,9 +106,9 @@ def cavity_flow(nt, u, v, dt, dx, dy, p, rho, nu):
                        (vn[2:, 1:-1] - 2 * vn[1:-1, 1:-1] + vn[0:-2, 1:-1])))
 
         u[0, :]  = 0
-        u[:, 0]  = 0
-        u[:, -1] = 0
-        u[-1, :] = 1    # set velocity on cavity lid equal to 1
+        u[:, 0]  = 10 # konstant hastighed ind og ud
+        u[:, -1] = 10 #
+        u[-1, :] = 0    
         v[0, :]  = 0
         v[-1, :] = 0
         v[:, 0]  = 0
@@ -107,13 +117,13 @@ def cavity_flow(nt, u, v, dt, dx, dy, p, rho, nu):
         
     return u, v, p
 
-sigma = .15
+sigma = .005
 dt = sigma * dx
 
 print(f"dx: {dx}")
 print(f"dt: {dt}")
 
-nt = 500
+nt = 100
 u, v, p = cavity_flow(nt, u, v, dt, dx, dy, p, rho, nu)
 
 fig = pyplot.figure(figsize=(11, 7), dpi=100)
